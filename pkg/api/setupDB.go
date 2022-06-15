@@ -2,23 +2,29 @@ package api
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/adiletelf/payment-system-go/pkg/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func SetupDB() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+var DB *gorm.DB
+
+func SetupDB() error {
+	filename := "test.db"
+	deleteFileIfExists(filename)
+	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect database: %w", err)
+		return fmt.Errorf("failed to connect database: %w", err)
 	}
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Transaction{})
 
 	populateDB(db)
 
-	return db, nil
+	DB = db
+	return nil
 }
 
 func populateDB(db *gorm.DB) {
@@ -33,4 +39,10 @@ func populateDB(db *gorm.DB) {
 	}
 
 	db.Create(&transactions)
+}
+
+func deleteFileIfExists(filename string) {
+	if _, err := os.Stat(filename); err == nil {
+		os.Remove(filename)
+	}
 }

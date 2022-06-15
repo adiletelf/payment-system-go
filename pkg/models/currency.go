@@ -1,13 +1,9 @@
 package models
 
-type Currency int
+type Currency string
 
 const (
-	Ruble Currency = iota
-	Dollar
-	Euro
+	Ruble  Currency = "ruble"
+	Dollar Currency = "dollar"
+	Euro   Currency = "euro"
 )
-
-func (c Currency) String() string {
-	return []string{"ruble", "dollar", "euro"}[c]
-}

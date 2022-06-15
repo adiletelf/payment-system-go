@@ -1,29 +1,21 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
 	"github.com/adiletelf/payment-system-go/pkg/api"
 	"github.com/gin-gonic/gin"
 )
 
-
-func handleRequests(r *gin.Engine) {
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "ok",
-		})
-	})
-	r.GET("/transaction", api.ReturnTransaction)
-}
-
 func main() {
-	// db, err := api.SetupDB()
-	// if err != nil {
-	// 	log.Fatalf(err.Error())
-	// }
+	err := api.SetupDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	r := gin.Default()
-	handleRequests(r)
+	r.GET("/transactions", api.GetAllTransactions)
+	r.POST("/transaction", api.CreateTransaction)
+
 	r.Run(":8080")
 }
