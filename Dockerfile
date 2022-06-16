@@ -1,11 +1,11 @@
-FROM golang:1.18.3-alpine3.16 AS builder
+FROM golang:1.18.3-bullseye AS builder
 
 RUN mkdir /app
-ADD . /app
+COPY . /app
 WORKDIR /app
 
-RUN CGP_ENABLED=0 GOOS=linux go build -o main ./...
+RUN go build -o build/main cmd/server/main.go
 
 FROM alpine:latest AS production
 COPY --from=builder /app .
-CMD ["./main"]
+CMD ["./build/main"]
