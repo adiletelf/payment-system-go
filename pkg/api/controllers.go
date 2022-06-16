@@ -2,13 +2,17 @@ package api
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/adiletelf/payment-system-go/pkg/models"
 	"github.com/gin-gonic/gin"
 )
+
+const TransactionCreatingFailureRate = 10
 
 type BaseHandler struct {
 	tr models.TransactionRepo
@@ -42,7 +46,13 @@ func (h *BaseHandler) CreateTransaction(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	h.tr.Save(t)
+
+	err = h.tr.Save(t)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusCreated, t)
 }
 
@@ -71,12 +81,17 @@ func bindTransactionInput(c *gin.Context) (*models.Transaction, error) {
 		return nil, err
 	}
 
-	transaction := models.NewTransaction(models.User{
+	t := models.NewTransaction(models.User{
 		ID:    input.UserID,
 		Email: input.Email,
 	}, input.Amount, input.Currency)
 
-	return &transaction, nil
+	// симулируем ошибки при создании
+	if isFailedTransaction(TransactionCreatingFailureRate) {
+		t.Status = models.Failed
+	}
+
+	return &t, nil
 }
 
 func checkCurrency(c models.Currency) error {
@@ -89,4 +104,9 @@ func checkCurrency(c models.Currency) error {
 		return fmt.Errorf("supported currencies: (%v)", currencies)
 	}
 	return nil
+}
+
+func isFailedTransaction(p int) bool {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(p) == 0
 }
