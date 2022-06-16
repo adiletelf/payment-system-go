@@ -9,22 +9,19 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
-func SetupDB() error {
+func SetupDB() (*gorm.DB, error) {
 	filename := "test.db"
 	deleteFileIfExists(filename)
 	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("failed to connect database: %w", err)
+		return nil, fmt.Errorf("failed to connect database: %w", err)
 	}
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Transaction{})
 
 	populateDB(db)
 
-	DB = db
-	return nil
+	return db, nil
 }
 
 func populateDB(db *gorm.DB) {

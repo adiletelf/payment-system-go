@@ -10,32 +10,65 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAllTransactions(c *gin.Context) {
-	var transactions []models.Transaction
+type BaseHandler struct {
+	tr models.TransactionRepo
+}
 
+func NewBaseHandler(tr models.TransactionRepo) *BaseHandler {
+	return &BaseHandler{
+		tr: tr,
+	}
+}
+
+func (h *BaseHandler) GetAllTransactions(c *gin.Context) {
 	email := c.Query("email")
 	userId, err := strconv.Atoi(c.Query("userId"))
 	if err != nil {
 		userId = 0
 	}
 
-	// query ignores parameter if zero field (0, "", false)
-	if err := DB.Where(&models.Transaction{UserID: uint(userId), Email: email}).Find(&transactions).Error; err != nil {
+	transactions, err := h.tr.Find(uint(userId), email)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, transactions)
 }
 
-func CreateTransaction(c *gin.Context) {
-	var input models.CreateTransactionInput
-	if err := c.ShouldBindJSON(&input); err != nil {
+func (h *BaseHandler) CreateTransaction(c *gin.Context) {
+	t, err := bindTransactionInput(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	h.tr.Save(t)
+	c.JSON(http.StatusCreated, t)
+}
+
+func (h *BaseHandler) GetTransactionStatus(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id."})
+		return
+	}
+	status, err := h.tr.GetStatus(uint(id))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	c.JSON(http.StatusOK, gin.H{"transactionStatus": status.String()})
+}
+
+func bindTransactionInput(c *gin.Context) (*models.Transaction, error) {
+	var input models.CreateTransactionInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		return nil, err
+	}
+
 	if err := checkCurrency(input.Currency); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return nil, err
 	}
 
 	transaction := models.NewTransaction(models.User{
@@ -43,20 +76,7 @@ func CreateTransaction(c *gin.Context) {
 		Email: input.Email,
 	}, input.Amount, input.Currency)
 
-	DB.Create(&transaction)
-
-	c.JSON(http.StatusCreated, transaction)
-}
-
-func GetTransactionStatus(c *gin.Context) {
-	var t models.Transaction
-
-	if err := DB.Where("id = ?", c.Param("id")).First(&t).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found."})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"transactionStatus": t.Status.String()})
+	return &transaction, nil
 }
 
 func checkCurrency(c models.Currency) error {
@@ -65,8 +85,8 @@ func checkCurrency(c models.Currency) error {
 	case models.Dollar:
 	case models.Euro:
 	default:
-		currencies := strings.Join([]string{string(models.Ruble), string(models.Dollar), string(models.Euro)}, ",")
-		return fmt.Errorf("supported currencies: (%q)", currencies)
+		currencies := strings.Join([]string{string(models.Ruble), string(models.Dollar), string(models.Euro)}, ", ")
+		return fmt.Errorf("supported currencies: (%v)", currencies)
 	}
 	return nil
 }

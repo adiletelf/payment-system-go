@@ -4,19 +4,23 @@ import (
 	"log"
 
 	"github.com/adiletelf/payment-system-go/pkg/api"
+	"github.com/adiletelf/payment-system-go/pkg/repositories"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	err := api.SetupDB()
+	db, err := api.SetupDB()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to connect database: %v", err)
 	}
 
+	tr := repositories.NewTransactionRepo(db)
+	h := api.NewBaseHandler(tr)
+
 	r := gin.Default()
-	r.GET("/transactions", api.GetAllTransactions)
-	r.GET("/transaction/:id", api.GetTransactionStatus)
-	r.POST("/transaction", api.CreateTransaction)
+	r.GET("/transactions", h.GetAllTransactions)
+	r.GET("/transaction/:id", h.GetTransactionStatus)
+	r.POST("/transaction", h.CreateTransaction)
 
 	r.Run(":8080")
 }
