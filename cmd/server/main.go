@@ -15,6 +15,7 @@ func main() {
 
 	r := gin.Default()
 	r.GET("/transactions", api.GetAllTransactions)
+	r.GET("/transaction/:id", api.GetTransactionStatus)
 	r.POST("/transaction", api.CreateTransaction)
 
 	r.Run(":8080")
