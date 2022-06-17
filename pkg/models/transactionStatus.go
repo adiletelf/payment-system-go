@@ -1,15 +1,11 @@
 package models
 
-type TransactionStatus int
+type TransactionStatus string
 
 const (
-	Created TransactionStatus = iota
-	Successed
-	Unsuccessed
-	Failed
-	Canceled
+	Created TransactionStatus = "created"
+	Succeed TransactionStatus = "succeed"
+	Unsucceed TransactionStatus = "unsucceed"
+	Failed TransactionStatus = "failed"
+	Canceled TransactionStatus = "canceled"
 )
-
-func (ts TransactionStatus) String() string {
-	return []string{"created", "successed", "unsuccessed", "failed", "canceled"}[ts]
-}

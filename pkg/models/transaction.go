@@ -1,6 +1,11 @@
 package models
 
-import "time"
+import (
+	"math/rand"
+	"time"
+)
+
+const oneInNFailureRate = 10
 
 type Transaction struct {
 	ID        uint              `json:"id" gorm:"primary_key"`
@@ -20,7 +25,7 @@ type TransactionRepo interface {
 }
 
 func NewTransaction(u User, amount float64, currency Currency) Transaction {
-	return Transaction{
+	t := Transaction{
 		UserID:    u.ID,
 		Email:     u.Email,
 		Amount:    amount,
@@ -29,4 +34,14 @@ func NewTransaction(u User, amount float64, currency Currency) Transaction {
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+	if isFailedTransaction(oneInNFailureRate) {
+		t.Status = Failed
+	}
+
+	return t
+}
+
+func isFailedTransaction(p int) bool {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(p) == 0
 }
