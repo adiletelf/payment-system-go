@@ -37,29 +37,29 @@ func (h *BaseHandler) GetAllTransactions(c *gin.Context) {
 }
 
 func (h *BaseHandler) CreateTransaction(c *gin.Context) {
-	t, err := bindTransactionInput(c)
+	input, err := bindCreateTransactionInput(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = h.tr.Save(t)
+	_, err = h.tr.FindById(input.ID)
+	if err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Record already exists."})
+		return
+	}
+
+	err = h.tr.UpdateStatusOrCreate(input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, t)
+	c.JSON(http.StatusCreated, input)
 }
 
 func (h *BaseHandler) GetTransactionStatus(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id."})
-		return
-	}
-
-	t, err := h.tr.FindById(uint(id))
+	t, err := h.findTransactionById(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -68,7 +68,29 @@ func (h *BaseHandler) GetTransactionStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"transactionStatus": t.Status})
 }
 
-func bindTransactionInput(c *gin.Context) (*models.Transaction, error) {
+func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
+	var input models.UpdateTransactionInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	t, err := h.findTransactionById(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	t.Status = input.Status
+	if err := h.tr.UpdateStatusOrCreate(t); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, t)
+}
+
+
+func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
 	var input models.CreateTransactionInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		return nil, err
@@ -84,6 +106,20 @@ func bindTransactionInput(c *gin.Context) (*models.Transaction, error) {
 	}, input.Amount, input.Currency)
 
 	return &t, nil
+}
+
+func (h *BaseHandler) findTransactionById(c *gin.Context) (*models.Transaction, error) {
+	id, err := strconv.Atoi(c.Param("id"))	
+	if err != nil {
+		return nil, fmt.Errorf("invalid id")
+	}
+
+	t, err := h.tr.FindById(uint(id))
+	if err != nil {
+		return nil, err
+	}
+
+	return t, nil
 }
 
 func checkCurrency(c models.Currency) error {

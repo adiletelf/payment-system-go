@@ -3,6 +3,7 @@ package repositories
 import (
 	"github.com/adiletelf/payment-system-go/pkg/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type TransactionRepoImpl struct {
@@ -35,8 +36,12 @@ func (tr *TransactionRepoImpl) FindById(id uint) (*models.Transaction, error) {
 	return &t, nil
 }
 
-func (tr *TransactionRepoImpl) Save(t *models.Transaction) error {
-	err := tr.db.Create(t).Error
+func (tr *TransactionRepoImpl) UpdateStatusOrCreate(t *models.Transaction) error {
+	err := tr.db.Clauses(clause.OnConflict{
+		Columns: []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"status"}),
+	}).Create(t).Error
+
 	if err != nil {
 		return err
 	}
