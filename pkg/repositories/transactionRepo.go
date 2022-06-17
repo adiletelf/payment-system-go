@@ -38,7 +38,7 @@ func (tr *TransactionRepoImpl) FindById(id uint) (*models.Transaction, error) {
 
 func (tr *TransactionRepoImpl) UpdateStatusOrCreate(t *models.Transaction) error {
 	err := tr.db.Clauses(clause.OnConflict{
-		Columns: []clause.Column{{Name: "id"}},
+		Columns:   []clause.Column{{Name: "id"}},
 		DoUpdates: clause.AssignmentColumns([]string{"status"}),
 	}).Create(t).Error
 

@@ -30,6 +30,6 @@ func (ts TransactionStatus) IsModifiable() error {
 	case Created, Failed, Canceled:
 		return nil
 	default:
-		return fmt.Errorf("transaction status (%v) is not modifiable", ts)
+		return fmt.Errorf("transaction is in not modifiable status (%v)", ts)
 	}
 }
