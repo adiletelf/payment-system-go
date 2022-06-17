@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/adiletelf/payment-system-go/pkg/api"
-	"github.com/adiletelf/payment-system-go/pkg/repositories"
+	"github.com/adiletelf/payment-system-go/internal/api"
+	"github.com/adiletelf/payment-system-go/internal/repositories"
 	"github.com/gin-gonic/gin"
 )
 

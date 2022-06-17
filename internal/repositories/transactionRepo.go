@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/adiletelf/payment-system-go/pkg/models"
+	"github.com/adiletelf/payment-system-go/internal/models"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

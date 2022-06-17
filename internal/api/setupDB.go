@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/adiletelf/payment-system-go/pkg/models"
+	"github.com/adiletelf/payment-system-go/internal/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )

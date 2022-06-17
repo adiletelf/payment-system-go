@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/adiletelf/payment-system-go/pkg/models"
+	"github.com/adiletelf/payment-system-go/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
