@@ -15,8 +15,8 @@ type Transaction struct {
 
 type TransactionRepo interface {
 	Find(userId uint, email string) ([]Transaction, error)
+	FindById(id uint) (*Transaction, error)
 	Save(t *Transaction) error
-	GetStatus(id uint) (TransactionStatus, error)
 }
 
 func NewTransaction(u User, amount float64, currency Currency) Transaction {

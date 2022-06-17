@@ -62,14 +62,28 @@ func (h *BaseHandler) GetTransactionStatus(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id."})
 		return
 	}
-	status, err := h.tr.GetStatus(uint(id))
+
+	t, err := h.tr.FindById(uint(id))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"transactionStatus": status.String()})
+	c.JSON(http.StatusOK, gin.H{"transactionStatus": t.Status.String()})
 }
+
+// func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
+// 	id, err := strconv.Atoi(c.Param("id"))
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id."})
+// 		return
+// 	}
+// 	t, err := h.tr.Find(uint(id), "")
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+// }
 
 func bindTransactionInput(c *gin.Context) (*models.Transaction, error) {
 	var input models.CreateTransactionInput
