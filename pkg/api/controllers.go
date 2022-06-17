@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/adiletelf/payment-system-go/pkg/models"
 	"github.com/gin-gonic/gin"
@@ -69,8 +68,8 @@ func (h *BaseHandler) GetTransactionStatus(c *gin.Context) {
 }
 
 func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
-	var input models.UpdateTransactionInput
-	if err := c.ShouldBindJSON(&input); err != nil {
+	input, err := bindUpdateTransactionInput(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -78,6 +77,12 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 	t, err := h.findTransactionById(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := t.Status.IsModifiable(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	t.Status = input.Status
@@ -89,14 +94,13 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
-
 func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
 	var input models.CreateTransactionInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		return nil, err
 	}
 
-	if err := checkCurrency(input.Currency); err != nil {
+	if err := input.Currency.IsSupported(); err != nil {
 		return nil, err
 	}
 
@@ -108,8 +112,20 @@ func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
 	return &t, nil
 }
 
+func bindUpdateTransactionInput(c *gin.Context) (*models.UpdateTransactionInput, error) {
+	var input models.UpdateTransactionInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		return nil, err
+	}
+
+	if err := input.Status.IsSupported(); err != nil {
+		return nil, err
+	}
+	return &input, nil
+}
+
 func (h *BaseHandler) findTransactionById(c *gin.Context) (*models.Transaction, error) {
-	id, err := strconv.Atoi(c.Param("id"))	
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid id")
 	}
@@ -120,16 +136,4 @@ func (h *BaseHandler) findTransactionById(c *gin.Context) (*models.Transaction, 
 	}
 
 	return t, nil
-}
-
-func checkCurrency(c models.Currency) error {
-	switch c {
-	case models.Ruble:
-	case models.Dollar:
-	case models.Euro:
-	default:
-		currencies := strings.Join([]string{string(models.Ruble), string(models.Dollar), string(models.Euro)}, ", ")
-		return fmt.Errorf("supported currencies: (%v)", currencies)
-	}
-	return nil
 }
