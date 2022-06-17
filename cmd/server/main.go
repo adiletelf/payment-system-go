@@ -18,6 +18,7 @@ func main() {
 	h := api.NewBaseHandler(tr)
 
 	r := gin.Default()
+	r.SetTrustedProxies([]string{"127.0.0.1"})
 	r.GET("/transactions", h.GetAllTransactions)
 
 	r.GET("/transaction/:id", h.GetTransactionStatus)
