@@ -3,19 +3,20 @@ package main
 import (
 	"log"
 
-	"github.com/adiletelf/payment-system-go/internal/api"
+	"github.com/adiletelf/payment-system-go/internal/handlers"
 	"github.com/adiletelf/payment-system-go/internal/repositories"
+	"github.com/adiletelf/payment-system-go/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	db, err := api.SetupDB()
+	db, err := utils.SetupDB()
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
 	tr := repositories.NewTransactionRepo(db)
-	h := api.NewBaseHandler(tr)
+	h := handlers.NewBaseHandler(tr)
 
 	r := gin.Default()
 	r.SetTrustedProxies([]string{"127.0.0.1"})
