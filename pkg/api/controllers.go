@@ -74,6 +74,11 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 		return
 	}
 
+	if input.Status == models.Canceled {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Not allowed to cancel transaction using current endpoint."})
+		return
+	}
+
 	t, err := h.findTransactionById(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -94,7 +99,6 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
-// Дупликация кода - не есть хорошо. Лучше использовать UpdateTransactionStatus.
 func (h *BaseHandler) CancelTransaction(c *gin.Context) {
 	t, err := h.findTransactionById(c)
 	if err != nil {
