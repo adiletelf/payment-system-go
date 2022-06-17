@@ -94,6 +94,28 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
+// Дупликация кода - не есть хорошо. Лучше использовать UpdateTransactionStatus.
+func (h *BaseHandler) CancelTransaction(c *gin.Context) {
+	t, err := h.findTransactionById(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := t.Status.IsModifiable(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	t.Status = models.Canceled
+	if err := h.tr.UpdateStatusOrCreate(t); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, t)
+}
+
 func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
 	var input models.CreateTransactionInput
 	if err := c.ShouldBindJSON(&input); err != nil {

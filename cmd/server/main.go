@@ -19,9 +19,12 @@ func main() {
 
 	r := gin.Default()
 	r.GET("/transactions", h.GetAllTransactions)
+
 	r.GET("/transaction/:id", h.GetTransactionStatus)
 	r.PUT("/transaction/:id", h.UpdateTransactionStatus)
 	r.POST("/transaction", h.CreateTransaction)
+
+	r.GET("/transaction/cancel/:id", h.CancelTransaction)
 
 	r.Run(":8080")
 }
