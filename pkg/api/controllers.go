@@ -115,7 +115,7 @@ func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
 func bindUpdateTransactionInput(c *gin.Context) (*models.UpdateTransactionInput, error) {
 	var input models.UpdateTransactionInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to unmarshall input")
 	}
 
 	if err := input.Status.IsSupported(); err != nil {
