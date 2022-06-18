@@ -1,19 +1,19 @@
-package handlers
+package handler
 
 import (
 	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/adiletelf/payment-system-go/internal/models"
+	"github.com/adiletelf/payment-system-go/internal/model"
 	"github.com/gin-gonic/gin"
 )
 
 type BaseHandler struct {
-	tr models.TransactionRepo
+	tr model.TransactionRepo
 }
 
-func NewBaseHandler(tr models.TransactionRepo) *BaseHandler {
+func NewBaseHandler(tr model.TransactionRepo) *BaseHandler {
 	return &BaseHandler{
 		tr: tr,
 	}
@@ -74,7 +74,7 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 		return
 	}
 
-	if input.Status == models.Canceled {
+	if input.Status == model.Canceled {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Not allowed to cancel transaction using current endpoint."})
 		return
 	}
@@ -111,7 +111,7 @@ func (h *BaseHandler) CancelTransaction(c *gin.Context) {
 		return
 	}
 
-	t.Status = models.Canceled
+	t.Status = model.Canceled
 	if err := h.tr.UpdateStatusOrCreate(t); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -120,8 +120,8 @@ func (h *BaseHandler) CancelTransaction(c *gin.Context) {
 	c.JSON(http.StatusOK, t)
 }
 
-func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
-	var input models.CreateTransactionInput
+func bindCreateTransactionInput(c *gin.Context) (*model.Transaction, error) {
+	var input model.CreateTransactionInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
 		return nil, err
 	}
 
-	t := models.NewTransaction(models.User{
+	t := model.NewTransaction(model.User{
 		ID:    input.UserID,
 		Email: input.Email,
 	}, input.Amount, input.Currency)
@@ -138,8 +138,8 @@ func bindCreateTransactionInput(c *gin.Context) (*models.Transaction, error) {
 	return &t, nil
 }
 
-func bindUpdateTransactionInput(c *gin.Context) (*models.UpdateTransactionInput, error) {
-	var input models.UpdateTransactionInput
+func bindUpdateTransactionInput(c *gin.Context) (*model.UpdateTransactionInput, error) {
+	var input model.UpdateTransactionInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		return nil, fmt.Errorf("unable to unmarshall input")
 	}
@@ -150,7 +150,7 @@ func bindUpdateTransactionInput(c *gin.Context) (*models.UpdateTransactionInput,
 	return &input, nil
 }
 
-func (h *BaseHandler) findTransactionById(c *gin.Context) (*models.Transaction, error) {
+func (h *BaseHandler) findTransactionById(c *gin.Context) (*model.Transaction, error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid id")
