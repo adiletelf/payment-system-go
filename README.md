@@ -10,10 +10,10 @@ docker run --rm -itp 8080:8080 --name payment-system-go adiletelf/payment-system
 Описание API представлено ниже.
 
 ### GetAllTransactions
-`GET /transactions?userId=xxx&email=xxx`
+`GET /api/transactions?userId=xxx&email=xxx`
 
 ```
-curl --request GET --url 'http://localhost:8080/transactions?userId=1'
+curl --request GET --url 'http://localhost:8080/api/transactions?userId=1'
 ```
 ```
 [
@@ -51,11 +51,11 @@ curl --request GET --url 'http://localhost:8080/transactions?userId=1'
 ```
 
 ### CreateTransaction
-`POST /transaction`
+`POST /api/transaction`
 
 ```
 curl --request POST \
-  --url http://localhost:8080/transaction \
+  --url http://localhost:8080/api/transaction \
   --header 'Content-Type: application/json' \
   --data '{
     "userId": 4,
@@ -78,10 +78,10 @@ curl --request POST \
 ```
 
 ### GetTransactionStatus
-`GET /transaction/:id`
+`GET /api/transaction/:id`
 ```
 curl --request GET \
-  --url 'http://localhost:8080/transaction/1?userId=1&email=first%40gmail.com'
+  --url 'http://localhost:8080/api/transaction/1?userId=1&email=first%40gmail.com'
 ```
 ```
 {
@@ -90,10 +90,10 @@ curl --request GET \
 ```
 
 ### UpdateTransactionStatus
-`PUT /transaction/:id`
+`PUT /api/transaction/:id`
 ```
 curl --request PUT \
-  --url http://localhost:8080/transaction/3 \
+  --url http://localhost:8080/api/transaction/3 \
   --header 'Content-Type: application/json' \
   --data '{ "status": "succeed" }'
 ```
@@ -111,10 +111,10 @@ curl --request PUT \
 ```
 
 ### CancelTransaction
-`GET /transaction/cancel/:id`
+`GET /api/transaction/cancel/:id`
 ```
 curl --request GET \
-  --url http://localhost:8080/transaction/cancel/1
+  --url http://localhost:8080/api/transaction/cancel/1
 ```
 ```
 {
@@ -126,5 +126,22 @@ curl --request GET \
   "status": "canceled",
   "createdAt": "2022-06-18T17:35:38.903344827+06:00",
   "updatedAt": "2022-06-18T17:35:38.903344868+06:00"
+}
+```
+
+### CurrentAdmin
+`GET /api/admin`
+```
+curl --request GET \
+  --url 'http://localhost:8080/api/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MSwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjU1NTcwMzUxfQ.ZgeqxEBbmBHnBO6WlMC-YQ72OiXW39Uaa_EeFpbLvM0'
+```
+```
+{
+  "data": {
+    "id": 1,
+    "username": "root",
+    "password": ""
+  },
+  "message": "success"
 }
 ```
