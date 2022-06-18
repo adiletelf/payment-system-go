@@ -11,7 +11,7 @@ func (a *Admin) PrepareGive() {
 }
 
 type AdminRepo interface {
-	Save(*Admin) (*Admin, error)	
+	Save(*Admin) (*Admin, error)
 	LoginCheck(username, password string) (string, error)
 	GetAdminById(uid uint) (Admin, error)
 }

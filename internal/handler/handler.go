@@ -17,7 +17,7 @@ type BaseHandler struct {
 func NewBaseHandler(tr model.TransactionRepo, ar model.AdminRepo) *BaseHandler {
 	return &BaseHandler{
 		tr: tr,
-		ar : ar,
+		ar: ar,
 	}
 }
 
