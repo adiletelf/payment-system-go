@@ -2,15 +2,22 @@ package util
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/adiletelf/payment-system-go/internal/model"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func SetupDB() (*gorm.DB, error) {
-	filename := "test.db"
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("error loading .env file")
+	}
+
+	filename := os.Getenv("DB_NAME")
 	deleteFileIfExists(filename)
 	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
 	if err != nil {
@@ -18,6 +25,7 @@ func SetupDB() (*gorm.DB, error) {
 	}
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Transaction{})
+	db.AutoMigrate(&model.Admin{})
 
 	populateDB(db)
 

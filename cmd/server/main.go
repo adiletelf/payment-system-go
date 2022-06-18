@@ -16,7 +16,8 @@ func main() {
 	}
 
 	tr := repository.NewTransactionRepo(db)
-	h := handler.NewBaseHandler(tr)
+	ar := repository.NewAdminRepo(db)
+	h := handler.NewBaseHandler(tr, ar)
 
 	r := gin.Default()
 	r.SetTrustedProxies([]string{"127.0.0.1"})
@@ -25,6 +26,9 @@ func main() {
 	r.GET("/transaction/:id", h.GetTransactionStatus)
 	r.PUT("/transaction/:id", h.UpdateTransactionStatus)
 	r.GET("/transaction/cancel/:id", h.CancelTransaction)
+
+	r.POST("/register", h.Register)
+	r.POST("/login", h.Login)
 
 	r.Run(":8080")
 }

@@ -11,11 +11,13 @@ import (
 
 type BaseHandler struct {
 	tr model.TransactionRepo
+	ar model.AdminRepo
 }
 
-func NewBaseHandler(tr model.TransactionRepo) *BaseHandler {
+func NewBaseHandler(tr model.TransactionRepo, ar model.AdminRepo) *BaseHandler {
 	return &BaseHandler{
 		tr: tr,
+		ar : ar,
 	}
 }
 
