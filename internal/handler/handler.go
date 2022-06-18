@@ -64,7 +64,7 @@ func (h *BaseHandler) GetTransactionStatus(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": t.Status})
+	c.JSON(http.StatusOK, gin.H{"status": string(t.Status)})
 }
 
 func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {

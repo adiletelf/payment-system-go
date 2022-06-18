@@ -96,11 +96,11 @@ func TestMain(m *testing.M) {
 	h := &BaseHandler{
 		tr: NewMockTransactionRepo(),
 	}
-	router.GET("/transactions", h.GetAllTransactions)
-	router.GET("/transaction/:id", h.GetTransactionStatus)
-	router.PUT("/transaction/:id", h.UpdateTransactionStatus)
-	router.POST("/transaction", h.CreateTransaction)
-	router.GET("/transaction/cancel/:id", h.CancelTransaction)
+	router.GET(GetAllTransactionsPath, h.GetAllTransactions)
+	router.GET(GetTransactionStatusPath+":id", h.GetTransactionStatus)
+	router.PUT(UpdateTransactionStatusPath+":id", h.UpdateTransactionStatus)
+	router.POST(CreateTransactionPath, h.CreateTransaction)
+	router.GET(CancelTransactionPath+":id", h.CancelTransaction)
 
 	m.Run()
 }
@@ -166,17 +166,21 @@ func TestBaseHandler_CreateTransaction_AlreadyExist(t *testing.T) {
 }
 
 func TestBaseHandler_GetTransactionStatus_NotFound(t *testing.T) {
-	id := "0"
+	id := "100"
 	w := performRequest("GET", GetTransactionStatusPath+id, nil)
+	var response map[string]any
+	err := json.Unmarshal(w.Body.Bytes(), &response)
 
+	assert.Nil(t, err)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
 func TestBaseHandler_GetTransactionStatus_ReturnsStatus(t *testing.T) {
-	id := "1"
-	w := performRequest("GET", GetTransactionStatusPath+id, nil)
+	// id := "1"
+	// w := performRequest("GET", GetTransactionStatusPath+id, nil)
+	w := performRequest("GET", "/transaction/1", nil)
 
-	var response map[string]string
+	var response map[string]any
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	status, exists := response["status"]
 
@@ -206,7 +210,7 @@ func TestBaseHandler_UpdateTransactionStatus_NotFound(t *testing.T) {
 		Status: model.Succeed,
 	}
 	json_data, _ := json.Marshal(input)
-	id := "0"
+	id := "100"
 	w := performRequest("PUT", UpdateTransactionStatusPath+id, bytes.NewBuffer(json_data))
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -237,7 +241,7 @@ func TestBaseHandler_UpdateTransactionStatus_ReturnsOK(t *testing.T) {
 }
 
 func TestBaseHandler_CancelTransaction_NotFound(t *testing.T) {
-	id := "0"
+	id := "100"
 	w := performRequest("GET", CancelTransactionPath+id, nil)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
