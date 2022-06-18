@@ -6,7 +6,12 @@ type Admin struct {
 	Password string `gorm:"size:255;not null;" json:"password"`
 }
 
+func (a *Admin) PrepareGive() {
+	a.Password = ""
+}
+
 type AdminRepo interface {
 	Save(*Admin) (*Admin, error)	
 	LoginCheck(username, password string) (string, error)
+	GetAdminById(uid uint) (Admin, error)
 }

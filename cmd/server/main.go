@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/adiletelf/payment-system-go/internal/handler"
+	"github.com/adiletelf/payment-system-go/internal/middleware"
 	"github.com/adiletelf/payment-system-go/internal/repository"
 	"github.com/adiletelf/payment-system-go/internal/util"
 	"github.com/gin-gonic/gin"
@@ -21,14 +22,20 @@ func main() {
 
 	r := gin.Default()
 	r.SetTrustedProxies([]string{"127.0.0.1"})
-	r.GET("/transactions", h.GetAllTransactions)
-	r.POST("/transaction", h.CreateTransaction)
-	r.GET("/transaction/:id", h.GetTransactionStatus)
-	r.PUT("/transaction/:id", h.UpdateTransactionStatus)
-	r.GET("/transaction/cancel/:id", h.CancelTransaction)
 
-	r.POST("/register", h.Register)
-	r.POST("/login", h.Login)
+	public := r.Group("/api/admin")
+	public.POST("/register", h.Register)
+	public.POST("/login", h.Login)
+
+	protected := r.Group("/api")
+	protected.Use(middleware.JwtAuthMiddleware())
+
+	protected.GET("/admin", h.CurrentAdmin)
+	protected.GET("/transactions", h.GetAllTransactions)
+	protected.POST("/transaction", h.CreateTransaction)
+	protected.GET("/transaction/:id", h.GetTransactionStatus)
+	protected.PUT("/transaction/:id", h.UpdateTransactionStatus)
+	protected.GET("/transaction/cancel/:id", h.CancelTransaction)
 
 	r.Run(":8080")
 }

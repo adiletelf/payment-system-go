@@ -11,7 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateToken(user_id uint) (string, error) {
+func GenerateToken(admin_id uint) (string, error) {
 	token_lifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
 	if err != nil {
 		return "", err
@@ -19,7 +19,7 @@ func GenerateToken(user_id uint) (string, error) {
 
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["user_id"] = user_id
+	claims["admin_id"] = admin_id
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(token_lifespan)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
@@ -67,7 +67,7 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	if ok && token.Valid {
 		base := 10
 		bitSize := 32
-		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), base, bitSize)
+		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["admin_id"]), base, bitSize)
 		if err != nil {
 			return 0, err
 		}

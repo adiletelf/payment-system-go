@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"html"
 	"strings"
 
@@ -65,4 +66,16 @@ func (ar *AdminRepoImpl) LoginCheck(username, password string) (string, error) {
 
 func VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
+func (ar *AdminRepoImpl) GetAdminById(uid uint) (model.Admin, error) {
+	var a model.Admin
+
+	if err := ar.db.First(&a, uid).Error; err != nil {
+		return a, errors.New("user not found!")
+	}
+
+	a.PrepareGive()
+
+	return a, nil
 }
