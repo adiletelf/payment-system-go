@@ -1,4 +1,4 @@
-package models
+package model
 
 type CreateTransactionInput struct {
 	UserID   uint     `json:"userId" binding:"required"`

@@ -1,11 +1,17 @@
-FROM golang:1.18.3-bullseye AS builder
+# Stage 1: build
+FROM golang:1.18.3-alpine3.16 AS builder
 
-RUN mkdir /app
-COPY . /app
 WORKDIR /app
+RUN apk add --virtual build-dependencies build-base gcc wget git
 
-RUN go build -o build/main cmd/server/main.go
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
 
+RUN go build -o main cmd/server/main.go
+
+# Stage 2: base image
 FROM alpine:latest AS production
-COPY --from=builder /app .
-CMD ["./build/main"]
+WORKDIR /app
+COPY --from=builder /app/main /usr/bin/main
+CMD ["/usr/bin/main"]
