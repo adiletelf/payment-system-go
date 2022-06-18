@@ -60,11 +60,11 @@ func (h *BaseHandler) CreateTransaction(c *gin.Context) {
 func (h *BaseHandler) GetTransactionStatus(c *gin.Context) {
 	t, err := h.findTransactionById(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"transactionStatus": t.Status})
+	c.JSON(http.StatusOK, gin.H{"status": t.Status})
 }
 
 func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
@@ -75,13 +75,13 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 	}
 
 	if input.Status == model.Canceled {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Not allowed to cancel transaction using current endpoint."})
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Not allowed to cancel transaction using current endpoint."})
 		return
 	}
 
 	t, err := h.findTransactionById(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -102,7 +102,7 @@ func (h *BaseHandler) UpdateTransactionStatus(c *gin.Context) {
 func (h *BaseHandler) CancelTransaction(c *gin.Context) {
 	t, err := h.findTransactionById(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
