@@ -13,5 +13,5 @@ RUN go build -o main cmd/server/main.go
 # Stage 2: base image
 FROM alpine:latest AS production
 WORKDIR /app
-COPY --from=builder /app/main /usr/bin/main
-CMD ["/usr/bin/main"]
+COPY --from=builder /app/main /app/.env /app/
+CMD ["/app/main"]
