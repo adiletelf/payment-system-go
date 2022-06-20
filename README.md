@@ -9,11 +9,32 @@ docker run --rm -itp 8080:8080 --name payment-system-go adiletelf/payment-system
 ## REST API
 Описание API представлено ниже.
 
+
+### Register
+`POST /api/admin/register`
+```
+curl --request POST \
+  --url 'http://localhost:8080/api/admin/register' \
+  --header "Content-Type: application/json" \
+  --data '{"username": "root", "password": "root"}'
+```
+
+### Login
+`POST /api/admin/login`
+```
+curl --request POST \
+  --url 'http://localhost:8080/api/admin/login' \
+  --header "Content-Type: application/json" \
+  --data '{"username": "root", "password": "root"}'
+```
+
 ### GetAllTransactions
 `GET /api/transactions?userId=xxx&email=xxx`
 
 ```
-curl --request GET --url 'http://localhost:8080/api/transactions?userId=1'
+curl --request GET --url 'http://localhost:8080/api/transactions' \
+  -d 'userId=1' \
+  -d 'token={{TOKEN}}'
 ```
 ```
 [
@@ -62,6 +83,8 @@ curl --request POST \
     "email": "fourth@gmail.com",
     "amount": 99.99,
     "currency": "ruble"
+  }'
+  -d 'token={{TOKEN}}'
 }'
 ```
 ```
@@ -81,7 +104,8 @@ curl --request POST \
 `GET /api/transaction/:id`
 ```
 curl --request GET \
-  --url 'http://localhost:8080/api/transaction/1?userId=1&email=first%40gmail.com'
+  --url 'http://localhost:8080/api/transaction/1?userId=1&email=first%40gmail.com' \
+  -d 'token={{TOKEN}}'
 ```
 ```
 {
@@ -93,9 +117,10 @@ curl --request GET \
 `PUT /api/transaction/:id`
 ```
 curl --request PUT \
-  --url http://localhost:8080/api/transaction/3 \
+  --url 'http://localhost:8080/api/transaction/3' \
   --header 'Content-Type: application/json' \
-  --data '{ "status": "succeed" }'
+  --data '{ "status": "succeed" }' \
+  -d 'token={{TOKEN}}'
 ```
 ```
 {
@@ -114,7 +139,8 @@ curl --request PUT \
 `GET /api/transaction/cancel/:id`
 ```
 curl --request GET \
-  --url http://localhost:8080/api/transaction/cancel/1
+  --url 'http://localhost:8080/api/transaction/cancel/1' \
+  -d 'token={{TOKEN}}'
 ```
 ```
 {
@@ -133,7 +159,8 @@ curl --request GET \
 `GET /api/admin`
 ```
 curl --request GET \
-  --url 'http://localhost:8080/api/admin?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MSwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjU1NTcwMzUxfQ.ZgeqxEBbmBHnBO6WlMC-YQ72OiXW39Uaa_EeFpbLvM0'
+  --url 'http://localhost:8080/api/admin' \
+  -d 'token={{TOKEN}}'
 ```
 ```
 {
