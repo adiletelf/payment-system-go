@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/adiletelf/payment-system-go/internal/handler"
 	"github.com/adiletelf/payment-system-go/internal/middleware"
@@ -28,7 +29,11 @@ func main() {
 	public.POST("/login", h.Login)
 
 	protected := r.Group("/api")
-	protected.Use(middleware.JwtAuthMiddleware())
+
+	useAuthentication := os.Getenv("USE_AUTHENTICATION")
+	if useAuthentication == "true" {
+		protected.Use(middleware.JwtAuthMiddleware())
+	}
 
 	protected.GET("/admin", h.CurrentAdmin)
 	protected.GET("/transactions", h.GetAllTransactions)

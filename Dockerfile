@@ -14,4 +14,5 @@ RUN go build -o main cmd/server/main.go
 FROM alpine:latest AS production
 WORKDIR /app
 COPY --from=builder /app/main /app/.env /app/
+ENV USE_AUTHENTICATION=true
 CMD ["/app/main"]
