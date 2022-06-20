@@ -13,6 +13,9 @@ RUN go build -o main cmd/server/main.go
 # Stage 2: base image
 FROM alpine:latest AS production
 WORKDIR /app
-COPY --from=builder /app/main /app/.env /app/
+COPY --from=builder /app/main /app/
+
 ENV USE_AUTHENTICATION=true
+ENV TOKEN_HOUR_LIFESPAN=1
+ENV API_SECRET=mysecretstring
 CMD ["/app/main"]

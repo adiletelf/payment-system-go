@@ -3,7 +3,8 @@
 
 ## Запустить сервис
 ```
-docker run --rm -itp 8080:8080 -e 'USE_AUTHENTICATION=false' --name payment-system-go adiletelf/payment-system-go
+docker run --rm -itp 8080:8080 -e 'USE_AUTHENTICATION=false' \
+  --name payment-system-go adiletelf/payment-system-go
 ```
 
 ## REST API
@@ -82,16 +83,15 @@ curl --request GET --url 'http://localhost:8080/api/transactions' \
 
 ```
 curl --request POST \
-  --url http://localhost:8080/api/transaction \
+  --url 'http://localhost:8080/api/transaction' \
   --header 'Content-Type: application/json' \
   --data '{
     "userId": 4,
     "email": "fourth@gmail.com",
     "amount": 99.99,
     "currency": "ruble"
-  }'
+  }' \
   -d 'token={{TOKEN}}'
-}'
 ```
 ```
 {
