@@ -27,6 +27,12 @@ curl --request POST \
   --header "Content-Type: application/json" \
   --data '{"username": "root", "password": "root"}'
 ```
+```
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbl9pZCI6MSwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjU1NzE3MjM2fQ.SUOo4bnIbLDhSLPWMKPeBTFezHNbmYbXEn6ryioIvFg"
+}
+```
+
 
 ### GetAllTransactions
 `GET /api/transactions?userId=xxx&email=xxx`
