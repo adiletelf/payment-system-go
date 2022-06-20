@@ -15,7 +15,7 @@ FROM alpine:latest AS production
 WORKDIR /app
 COPY --from=builder /app/main /app/
 
-ENV USE_AUTHENTICATION=true
+ENV AUTHENTICATION_ENABLED=true
 ENV TOKEN_HOUR_LIFESPAN=1
 ENV API_SECRET=mysecretstring
 CMD ["/app/main"]

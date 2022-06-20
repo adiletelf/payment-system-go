@@ -30,7 +30,7 @@ func main() {
 
 	protected := r.Group("/api")
 
-	useAuthentication := os.Getenv("USE_AUTHENTICATION")
+	useAuthentication := os.Getenv("AUTHENTICATION_ENABLED")
 	if useAuthentication == "true" {
 		protected.Use(middleware.JwtAuthMiddleware())
 	}

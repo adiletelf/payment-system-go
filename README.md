@@ -3,7 +3,7 @@
 
 ## Запустить сервис
 ```
-docker run --rm -itp 8080:8080 -e 'USE_AUTHENTICATION=false' \
+docker run --rm -itp 8080:8080 -e 'AUTHENTICATION_ENABLED=false' \
   --name payment-system-go adiletelf/payment-system-go
 ```
 
