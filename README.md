@@ -110,7 +110,7 @@ curl --request POST \
 `GET /api/transaction/:id`
 ```
 curl --request GET \
-  --url 'http://localhost:8080/api/transaction/1?userId=1&email=first%40gmail.com' \
+  --url 'http://localhost:8080/api/transaction/1' \
   -d 'token={{TOKEN}}'
 ```
 ```
