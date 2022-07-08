@@ -41,27 +41,29 @@ func (ar *AdminRepoImpl) BeforeSave(a *model.Admin) error {
 	return nil
 }
 
-func (ar *AdminRepoImpl) LoginCheck(username, password string) (string, error) {
+func (ar *AdminRepoImpl) LoginCheck(username, password string) (string, string, error) {
 	var err error
 	a := model.Admin{}
 
 	err = ar.db.Model(model.Admin{}).Where("username = ?", username).Take(&a).Error
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	err = VerifyPassword(password, a.Password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
+		return "", "", err
 	}
 
-	token, err := token.GenerateToken(a.ID)
+	accessToken, refreshToken, err := token.GenerateToken(a.ID)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
+	// save AccessToken, RefreshToken
+	// return 2 tokens
 
-	return token, nil
+	return accessToken, refreshToken, nil
 }
 
 func VerifyPassword(password, hashedPassword string) error {
@@ -72,7 +74,7 @@ func (ar *AdminRepoImpl) GetAdminById(uid uint) (model.Admin, error) {
 	var a model.Admin
 
 	if err := ar.db.First(&a, uid).Error; err != nil {
-		return a, errors.New("user not found!")
+		return a, errors.New("user not found")
 	}
 
 	a.PrepareGive()
